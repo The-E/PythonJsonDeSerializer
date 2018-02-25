@@ -1,8 +1,10 @@
 import io
 
+# Helper functions
 def is_builtin_class_instance(obj):
     return obj.__class__.__module__ == 'builtins'
 
+# Marks the last element of a collection 
 def islast(o):
     it = iter(o)
     e = next(it)

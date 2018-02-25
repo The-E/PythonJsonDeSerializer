@@ -9,7 +9,7 @@ def tokenize(json : str):
     tmp = data.partition(':')
 
     while tmp[2] != '':
-        key = tmp[0].rstrip(' "').lstrip(' "')
+        key = tmp[0].rstrip(' ,"').lstrip(' ,"')
         value = tmp[2].rstrip().lstrip()
     
         if value.startswith('['):
@@ -20,7 +20,10 @@ def tokenize(json : str):
             value = value.split(',', 1)
 
         result[key] = value[0]
-        tmp = value[1].partition(':')
+        if len(value) > 1: 
+            tmp = value[1].partition(':')
+        else:
+            break # we've reached the end of the input string
 
     return result
 
