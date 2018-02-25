@@ -47,17 +47,17 @@ def json_serialize(obj):
 
     for (last, property) in islast(properties):
         result.write('\"' + property + '\": ')
-        attribute = getattr(obj, property)
-        if isinstance(attribute, (list, tuple)):
-            result.write(collection_serialize(attribute))
+        value = getattr(obj, property)
+        if isinstance(value, (list, tuple)):
+            result.write(collection_serialize(value))
         else:
-            if (is_builtin_class_instance(attribute)):
-                if isinstance(attribute, str):
-                    result.write('\"' + attribute + '\"')
+            if (is_builtin_class_instance(value)):
+                if isinstance(value, str):
+                    result.write('\"' + value + '\"')
                 else:
-                    result.write(str(attribute))
+                    result.write(str(value))
             else:
-                result.write(json_serialize(attribute))
+                result.write(json_serialize(value))
         if not last:
             result.write(', ')
     
