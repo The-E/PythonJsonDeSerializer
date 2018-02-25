@@ -24,25 +24,26 @@ class Test_test_BackendTask(unittest.TestCase):
         self.assertEquals(a_property.name, 'Test')
         self.assertEquals(a_property.value, 100)
 
-    #def test_propertyset_serialize(self):
-    #    property_set = PropertySet('Test Property Set 1')
-    #    property_set.properties.append(Property('Width', 100))
-    #    property_set.properties.append(Property('Height', 100))
-    #    property_set.properties.append(Property('ThermalTransmittance', 0.9))
-    #    property_set.properties.append(Property('FireResistance', 'Class 4'))
-    #    property_set.properties.append(Property('WindLoadRating', 'Class 3'))
+    def test_propertyset_serialize(self):
+        self.maxDiff = None
+        property_set = PropertySet('Test Property Set 1')
+        property_set.properties.append(Property('Width', 100))
+        property_set.properties.append(Property('Height', 100))
+        property_set.properties.append(Property('ThermalTransmittance', 0.9))
+        property_set.properties.append(Property('FireResistance', 'Class 4'))
+        property_set.properties.append(Property('WindLoadRating', 'Class 3'))
 
-    #    json = json_serialize(property_set)
+        json = json_serialize(property_set)
 
-    #    self.assertEquals(json, example_input[0])
+        self.assertEquals(json, '{"name": "Test Property Set 1", "properties": [{"name": "Width", "type": "Property", "value": 100}, {"name": "Height", "type": "Property", "value": 100}, {"name": "ThermalTransmittance", "type": "Property", "value": 0.9}, {"name": "FireResistance", "type": "Property", "value": "Class 4"}, {"name": "WindLoadRating", "type": "Property", "value": "Class 3"}], "type": "PropertySet"}')
         
     def test_propertyset_deserialize(self):
-        property_set_0 = property_set_deserialize(example_input[0])
+        self.assertIsInstance(property_set_deserialize(example_input[0]), PropertySet)
         self.assertRaisesRegex(SyntaxError, 'Property invalid: No type string found', property_set_deserialize, example_input[1])
         self.assertRaisesRegex(SyntaxError, 'Property WindLoadRating is invalid: No value found', property_set_deserialize, example_input[2])
         self.assertRaisesRegex(SyntaxError, 'Property invalid: No name string found', property_set_deserialize, example_input[3])
         self.assertRaisesRegex(SyntaxError, 'Property invalid: Type string is Properti, should be "Property"', property_set_deserialize, example_input[4])
-        self.assertRaisesRegex(SyntaxError, 'Type string is: PropertiSet, should be "PropertySet"', property_set_deserialize, example_input[5])
+        self.assertRaisesRegex(SyntaxError, 'PropertySet invalid: Type string is: PropertiSet, should be "PropertySet"', property_set_deserialize, example_input[5])
 
 
 if __name__ == '__main__':
