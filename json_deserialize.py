@@ -86,10 +86,10 @@ def property_set_deserialize(json) -> PropertySet:
 
     # Is this a PropertySet?
     if 'type' not in parsed_object:
-        raise ParseError('Could not find type string')
+        raise ParseError('PropertySet invalid: Could not find type string')
 
     if 'name' not in parsed_object:
-        raise ParseError('Could not find name string')
+        raise ParseError('PropertySet invalid: Could not find name string')
 
     if not parsed_object['type'] == 'PropertySet':
         raise ParseError('PropertySet invalid: Type string is: ' + parsed_object['type'] + ', should be "PropertySet"')
