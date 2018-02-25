@@ -2,7 +2,7 @@ import unittest
 
 from BackendTask import PropertySet
 from BackendTask import Property
-from json_serialize import *
+from json_serialize import json_serialize
 from json_deserialize import *
 from example_input import *
 
@@ -38,11 +38,11 @@ class Test_test_BackendTask(unittest.TestCase):
         
     def test_propertyset_deserialize(self):
         self.assertIsInstance(property_set_deserialize(example_input[0]), PropertySet)
-        self.assertRaisesRegex(SyntaxError, 'Property invalid: No type string found', property_set_deserialize, example_input[1])
-        self.assertRaisesRegex(SyntaxError, 'Property WindLoadRating is invalid: No value found', property_set_deserialize, example_input[2])
-        self.assertRaisesRegex(SyntaxError, 'Property invalid: No name string found', property_set_deserialize, example_input[3])
-        self.assertRaisesRegex(SyntaxError, 'Property invalid: Type string is Properti, should be "Property"', property_set_deserialize, example_input[4])
-        self.assertRaisesRegex(SyntaxError, 'PropertySet invalid: Type string is: PropertiSet, should be "PropertySet"', property_set_deserialize, example_input[5])
+        self.assertRaisesRegex(ParseError, 'Property invalid: No type string found', property_set_deserialize, example_input[1])
+        self.assertRaisesRegex(ParseError, 'Property WindLoadRating is invalid: No value found', property_set_deserialize, example_input[2])
+        self.assertRaisesRegex(ParseError, 'Property invalid: No name string found', property_set_deserialize, example_input[3])
+        self.assertRaisesRegex(ParseError, 'Property invalid: Type string is Properti, should be "Property"', property_set_deserialize, example_input[4])
+        self.assertRaisesRegex(ParseError, 'PropertySet invalid: Type string is: PropertiSet, should be "PropertySet"', property_set_deserialize, example_input[5])
 
     def test_serialization_loop(self):
         property_set = PropertySet('Test Property Set 1')

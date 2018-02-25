@@ -77,7 +77,7 @@ def json_deserialize(json : str):
     tokens = tokenize(parseable)
 
     for key in tokens.keys():
-        result[key.lstrip(' "').rstrip(' "')] = get_value(tokens[key])
+        result[key] = get_value(tokens[key])
 
     return result
 
@@ -86,13 +86,13 @@ def property_set_deserialize(json) -> PropertySet:
 
     # Is this a PropertySet?
     if 'type' not in parsed_object:
-        raise SyntaxError('Could not find type string')
+        raise ParseError('Could not find type string')
 
     if 'name' not in parsed_object:
-        raise SyntaxError('Could not find name string')
+        raise ParseError('Could not find name string')
 
     if not parsed_object['type'] == 'PropertySet':
-        raise SyntaxError('PropertySet invalid: Type string is: ' + parsed_object['type'] + ', should be "PropertySet"')
+        raise ParseError('PropertySet invalid: Type string is: ' + parsed_object['type'] + ', should be "PropertySet"')
 
     property_set = PropertySet(parsed_object['name'])
 
@@ -100,14 +100,17 @@ def property_set_deserialize(json) -> PropertySet:
         for property in parsed_object['properties']:
             # Is this a property?
             if 'type' not in property:
-                raise SyntaxError('Property invalid: No type string found')
+                raise ParseError('Property invalid: No type string found')
             if not property['type'] == 'Property':
-                raise SyntaxError('Property invalid: Type string is ' + property['type'] + ', should be "Property"')
+                raise ParseError('Property invalid: Type string is ' + property['type'] + ', should be "Property"')
             if 'name' not in property:
-                raise SyntaxError('Property invalid: No name string found')
+                raise ParseError('Property invalid: No name string found')
             if 'value' not in property:
-                raise SyntaxError('Property ' + property['name'] + ' is invalid: No value found')
+                raise ParseError('Property ' + property['name'] + ' is invalid: No value found')
             
             property_set.properties.append(Property(property['name'], property['value']))
     
     return property_set
+
+class ParseError(Exception):
+    pass
