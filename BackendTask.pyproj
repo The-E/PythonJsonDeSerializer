@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{576aa226-0550-49ab-bf4f-80d1f52fdffd}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>BackendTask.py</StartupFile>
+    <StartupFile>test_BackendTask.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -22,6 +22,10 @@
     <Compile Include="BackendTask.py" />
     <Compile Include="example_input.py" />
     <Compile Include="example_output.py" />
+    <Compile Include="json_deserialize.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="json_serialize.py" />
     <Compile Include="test_BackendTask.py" />
   </ItemGroup>
   <ItemGroup>

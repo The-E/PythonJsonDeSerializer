@@ -1,5 +1,3 @@
-from BackendTask import PropertySet
-from BackendTask import Property
 
 property_set = PropertySet('Test Property Set 1')
 property_set.properties.append(Property('Width', 100))
