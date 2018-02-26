@@ -26,7 +26,7 @@ def collection_serialize(obj):
             if isinstance(value, str):
                 result.write('\"' + value + '\"')
             else:
-                result.write(str(value))
+                result.write(repr(value))
         else:
             result.write(json_serialize(value))
         if not last:
@@ -55,7 +55,7 @@ def json_serialize(obj):
                 if isinstance(value, str):
                     result.write('\"' + value + '\"')
                 else:
-                    result.write(str(value))
+                    result.write(repr(value))
             else:
                 result.write(json_serialize(value))
         if not last:
