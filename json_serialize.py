@@ -22,7 +22,7 @@ def collection_serialize(obj):
 
     result.write('[')
     for (last, value) in islast(obj):
-        if (is_builtin_class_instance(value)):
+        if is_builtin_class_instance(value):
             if isinstance(value, str):
                 result.write('\"' + value + '\"')
             else:

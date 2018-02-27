@@ -22,6 +22,9 @@
     <Compile Include="BackendTask.py" />
     <Compile Include="example_input.py" />
     <Compile Include="example_output.py" />
+    <Compile Include="json_parse.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="json_deserialize.py">
       <SubType>Code</SubType>
     </Compile>
