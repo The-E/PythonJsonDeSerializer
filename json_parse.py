@@ -23,17 +23,16 @@ _token_separator = ','
 _pair_separator = ':'
 
 def _whitespace_skip(json_iterator : peekable):
-    next_char = json_iterator.peek()
     while json_iterator.peek() in string.whitespace:
         json_iterator.next()
 
 def _parse_string(json_iterator : peekable) -> str:
     result = ''
-    json_iterator.next()
+    json_iterator.next() # Skip over opening "
 
     while True:
         next_char = json_iterator.next()
-        if next_char == '"':
+        if next_char == '"' and not result.endswith('\\'):
             break
         result += next_char
 
@@ -46,7 +45,7 @@ def _parse_numeric(json_iterator : peekable) -> numbers.Number:
     while True:
         value += next_char
         next_char = json_iterator.peek()
-        if next_char in string.whitespace or next_char in(_token_separator, _object_end, _array_end):
+        if next_char in string.whitespace or next_char in (_token_separator, _object_end, _array_end):
             break
         else:
             next_char = json_iterator.next()
@@ -60,7 +59,7 @@ def _parse_boolean(json_iterator : peekable) -> bool:
     value = ''
         
     next_char = json_iterator.next()
-    while next_char not in string.whitespace and next_char != _token_separator:
+    while next_char not in string.whitespace and next_char not in (_token_separator, _object_end, _array_end):
         next_char = json_iterator.next()
         value += next_char
 
@@ -75,7 +74,7 @@ def _parse_null(json_iterator : peekable):
     value = ''
         
     next_char = json_iterator.next()
-    while next_char not in string.whitespace and next_char != _token_separator:
+    while next_char not in string.whitespace and next_char not in (_token_separator, _object_end, _array_end):
         next_char = json_iterator.next()
         value += next_char
 
@@ -123,8 +122,9 @@ def _parse_array(json_iterator : peekable) -> list:
 
 
 def _parse_object(json_iterator : peekable) -> dict:
-    if json_iterator.next() != _object_start:
-        raise ParseError('Invalid start of object!')
+    next_char = json_iterator.next()
+    if next_char != _object_start:
+        raise ParseError('Unexpected character while trying to parse object: "' + next_char + '"')
 
     tokens = {}
 
@@ -140,7 +140,7 @@ def _parse_object(json_iterator : peekable) -> dict:
         _whitespace_skip(json_iterator)
         next_char = json_iterator.peek()
         if next_char != _pair_separator:
-            raise ParseError('Error while parsing element name ' + element_name + ': No value found')
+            raise ParseError('Unexpected character while parsing element name ' + element_name + ': "' + next_char + '"')
         json_iterator.next()
         _whitespace_skip(json_iterator)
 
@@ -159,7 +159,7 @@ def _parse_object(json_iterator : peekable) -> dict:
         elif next_char == _null_start: # JSON defines a "null" value
             element_value = _parse_null(json_iterator)
         else: # We've hit something invalid, let's abort
-            raise ParseError('Unexpected character in json string: ' + next_char)
+            raise ParseError('Unexpected character while parsing element name ' + element_name + ': "' + next_char + '"')
 
         tokens[element_name] = element_value
 
@@ -167,7 +167,7 @@ def _parse_object(json_iterator : peekable) -> dict:
         _whitespace_skip(json_iterator)
         next_char = json_iterator.peek()
         if not next_char in (_pair_separator, _object_end, _token_separator):
-            raise ParseError('Error after parsing element ' + element_name + ': Invalid character "' + next_char + '" found, expected "' + _pair_separator + '" or "' + _object_end + '"')
+            raise ParseError('Unexpected character while parsing element name ' + element_name + ': "' + next_char + '"')
         json_iterator.next()
         if next_char == _object_end:
             break
@@ -180,9 +180,8 @@ def _parse_object(json_iterator : peekable) -> dict:
 def _syntax_check(json : str) -> (bool, list):
     check_objects = json.count(_object_start) - json.count(_object_end) == 0
     check_arrays = json.count(_array_start) - json.count(_array_end) == 0
-    check_strings = json.count(_string_delimiter) % 2 == 0
 
-    if check_objects and check_arrays and check_strings:
+    if check_objects and check_arrays:
         return (True, [])
     else:
         fails = []
@@ -190,8 +189,6 @@ def _syntax_check(json : str) -> (bool, list):
             fails.append('objects')
         if not check_arrays:
             fails.append('arrays')
-        if not check_strings:
-            fails.append('strings')
         return (False, fails)
 
 # Given a json string, return a representation of that string as a dict 
