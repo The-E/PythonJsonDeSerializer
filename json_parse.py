@@ -182,9 +182,8 @@ def _parse_object(json_iterator : peekable) -> dict:
 def _syntax_check(json : str) -> (bool, list):
     check_objects = json.count(_object_start) - json.count(_object_end) == 0
     check_arrays = json.count(_array_start) - json.count(_array_end) == 0
-    check_strings = json.count(_string_delimiter) % 2 == 0
 
-    if check_objects and check_arrays and check_strings:
+    if check_objects and check_arrays:
         return (True, [])
     else:
         fails = []
@@ -192,8 +191,6 @@ def _syntax_check(json : str) -> (bool, list):
             fails.append('objects')
         if not check_arrays:
             fails.append('arrays')
-        if not check_strings:
-            fails.append('strings')
         return (False, fails)
 
 # Given a json string, return a representation of that string as a dict 
