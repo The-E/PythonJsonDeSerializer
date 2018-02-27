@@ -8,11 +8,11 @@ class ParseError(Exception):
 
 
 # JSON syntactic elements
-_object_open = '{'
-_object_close = '}'
+_object_start = '{'
+_object_end = '}'
 
-_array_open = '['
-_array_close = ']'
+_array_start = '['
+_array_end = ']'
 
 _string_delimiter = '"'
 _numeric_start = ('-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
@@ -48,7 +48,7 @@ def _parse_numeric(json_iterator : peekable) -> numbers.Number:
     while True:
         value += next_char
         next_char = json_iterator.peek()
-        if next_char in string.whitespace or next_char in(_token_separator, _object_close, _array_close):
+        if next_char in string.whitespace or next_char in(_token_separator, _object_end, _array_end):
             break
         else:
             next_char = json_iterator.next()
@@ -92,13 +92,13 @@ def _parse_array(json_iterator : peekable) -> list:
     _whitespace_skip(json_iterator)
     next_char = json_iterator.peek()
     
-    if next_char == _array_close:
+    if next_char == _array_end:
         return [] # Empty Array
 
     while True:
-        if next_char == _object_open:
+        if next_char == _object_start:
             element_value = _parse_object(json_iterator)
-        elif next_char == _array_open:
+        elif next_char == _array_start:
             element_value = _parse_array(json_iterator)
         elif next_char == _string_delimiter:
             element_value = _parse_string(json_iterator)
@@ -113,10 +113,9 @@ def _parse_array(json_iterator : peekable) -> list:
 
         _whitespace_skip(json_iterator)
         next_char = json_iterator.peek()
-        if next_char == _array_close:
+        if next_char == _array_end:
             json_iterator.next()
             return values
-            break
         elif next_char == _token_separator:
             next_char = json_iterator.next()
             _whitespace_skip(json_iterator)
@@ -126,7 +125,7 @@ def _parse_array(json_iterator : peekable) -> list:
 
 
 def _parse_object(json_iterator : peekable) -> dict:
-    if json_iterator.next() != _object_open:
+    if json_iterator.next() != _object_start:
         raise ParseError('Invalid start of object!')
 
     tokens = {}
@@ -149,17 +148,17 @@ def _parse_object(json_iterator : peekable) -> dict:
 
         # Parse the value element
         next_char = json_iterator.peek()
-        if next_char == _object_open:
+        if next_char == _object_start:
             element_value = _parse_object(json_iterator)
-        elif next_char == _array_open:
+        elif next_char == _array_start:
             element_value = _parse_array(json_iterator)
         elif next_char == _string_delimiter:
             element_value = _parse_string(json_iterator)
         elif next_char in _numeric_start:
             element_value = _parse_numeric(json_iterator)
-        elif next_char in ('t', 'f'): # JSON defines boolean values as "true" or "false" exclusively
+        elif next_char in _boolean_start: # JSON defines boolean values as "true" or "false" exclusively
             element_value = _parse_boolean(json_iterator)
-        elif next_char == ('n'): # JSON defines a "null" value
+        elif next_char == _null_start: # JSON defines a "null" value
             element_value = _parse_null(json_iterator)
         else: # We've hit something invalid, let's abort
             raise ParseError('Unexpected character in json string: ' + next_char)
@@ -169,10 +168,10 @@ def _parse_object(json_iterator : peekable) -> dict:
         # Advance the iterator over whitespace, the token separator, whitespace to the start of the next token
         _whitespace_skip(json_iterator)
         next_char = json_iterator.peek()
-        if not next_char in (_pair_separator, _object_close, _token_separator):
-            raise ParseError('Error after parsing element ' + element_name + ': Invalid character "' + next_char + '" found, expected "' + _pair_separator + '" or "' + _object_close + '"')
+        if not next_char in (_pair_separator, _object_end, _token_separator):
+            raise ParseError('Error after parsing element ' + element_name + ': Invalid character "' + next_char + '" found, expected "' + _pair_separator + '" or "' + _object_end + '"')
         json_iterator.next()
-        if next_char == _object_close:
+        if next_char == _object_end:
             break
         _whitespace_skip(json_iterator)
 
@@ -181,8 +180,8 @@ def _parse_object(json_iterator : peekable) -> dict:
 # Check if the number of opening and closing elements for objects and arrays match up
 # returns true if they do, if they don't, the returned list of strings will indicate which test(s) failed
 def _syntax_check(json : str) -> (bool, list):
-    check_objects = json.count(_object_open) - json.count(_object_close) == 0
-    check_arrays = json.count(_array_open) - json.count(_array_close) == 0
+    check_objects = json.count(_object_start) - json.count(_object_end) == 0
+    check_arrays = json.count(_array_start) - json.count(_array_end) == 0
     check_strings = json.count(_string_delimiter) % 2 == 0
 
     if check_objects and check_arrays and check_strings:
