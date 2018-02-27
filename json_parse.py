@@ -140,7 +140,7 @@ def _parse_object(json_iterator : peekable) -> dict:
         _whitespace_skip(json_iterator)
         next_char = json_iterator.peek()
         if next_char != _pair_separator:
-            raise ParseError('Unexpected character while parsing element name ' + element_name + ': "' + next_char + '"')
+            raise ParseError('Unexpected character while parsing element ' + element_name + ': "' + next_char + '"')
         json_iterator.next()
         _whitespace_skip(json_iterator)
 
@@ -159,7 +159,7 @@ def _parse_object(json_iterator : peekable) -> dict:
         elif next_char == _null_start: # JSON defines a "null" value
             element_value = _parse_null(json_iterator)
         else: # We've hit something invalid, let's abort
-            raise ParseError('Unexpected character while parsing element name ' + element_name + ': "' + next_char + '"')
+            raise ParseError('Unexpected character while parsing element ' + element_name + ': "' + next_char + '"')
 
         tokens[element_name] = element_value
 
@@ -167,7 +167,7 @@ def _parse_object(json_iterator : peekable) -> dict:
         _whitespace_skip(json_iterator)
         next_char = json_iterator.peek()
         if not next_char in (_pair_separator, _object_end, _token_separator):
-            raise ParseError('Unexpected character while parsing element name ' + element_name + ': "' + next_char + '"')
+            raise ParseError('Unexpected character while parsing element ' + element_name + ': "' + next_char + '"')
         json_iterator.next()
         if next_char == _object_end:
             break
