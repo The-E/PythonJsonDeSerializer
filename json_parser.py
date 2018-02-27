@@ -57,11 +57,12 @@ def _parse_numeric(json_iterator : peekable) -> numbers.Number:
 
 def _parse_boolean(json_iterator : peekable) -> bool:
     value = ''
-        
+    
     next_char = json_iterator.next()
+    
     while next_char not in string.whitespace and next_char not in (_token_separator, _object_end, _array_end):
-        next_char = json_iterator.next()
         value += next_char
+        next_char = json_iterator.next()
 
     if value == 'true':
         return True
@@ -75,8 +76,8 @@ def _parse_null(json_iterator : peekable):
         
     next_char = json_iterator.next()
     while next_char not in string.whitespace and next_char not in (_token_separator, _object_end, _array_end):
-        next_char = json_iterator.next()
         value += next_char
+        next_char = json_iterator.next()
 
     if value == 'null':
         return None
