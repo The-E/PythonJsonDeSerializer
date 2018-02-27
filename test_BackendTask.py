@@ -13,17 +13,17 @@ class Test_test_BackendTask(unittest.TestCase):
 
         a_property_set = PropertySet('Test')
 
-        self.assertEquals(a_property_set.type, 'PropertySet')
-        self.assertEquals(a_property_set.name, 'Test')
+        self.assertEqual(a_property_set.type, 'PropertySet')
+        self.assertEqual(a_property_set.name, 'Test')
         self.assertTrue(len(a_property_set.properties) == 0)
 
     def test_property_create(self):
 
         a_property = Property('Test', 100)
 
-        self.assertEquals(a_property.type, 'Property')
-        self.assertEquals(a_property.name, 'Test')
-        self.assertEquals(a_property.value, 100)
+        self.assertEqual(a_property.type, 'Property')
+        self.assertEqual(a_property.name, 'Test')
+        self.assertEqual(a_property.value, 100)
 
     def test_propertyset_serialize(self):
         self.maxDiff = None
@@ -35,7 +35,7 @@ class Test_test_BackendTask(unittest.TestCase):
         property_set.properties.append(Property('WindLoadRating', 'Class 3'))
 
         json = json_serializer.json_serialize(property_set)
-        self.assertEquals(json, '{"name": "Test Property Set 1", "properties": [{"name": "Width", "type": "Property", "value": 100}, {"name": "Height", "type": "Property", "value": 100}, {"name": "ThermalTransmittance", "type": "Property", "value": 0.9}, {"name": "FireResistance", "type": "Property", "value": "Class 4"}, {"name": "WindLoadRating", "type": "Property", "value": "Class 3"}], "type": "PropertySet"}')
+        self.assertEqual(json, '{"name": "Test Property Set 1", "properties": [{"name": "Width", "type": "Property", "value": 100}, {"name": "Height", "type": "Property", "value": 100}, {"name": "ThermalTransmittance", "type": "Property", "value": 0.9}, {"name": "FireResistance", "type": "Property", "value": "Class 4"}, {"name": "WindLoadRating", "type": "Property", "value": "Class 3"}], "type": "PropertySet"}')
         
     def test_propertyset_deserialize(self):
         property_set = property_set_deserializer.property_set_deserialize(example_input[0])
@@ -98,9 +98,9 @@ class Test_test_BackendTask(unittest.TestCase):
 
     def test_json(self):
         self.assertEqual(json_parser.json_parse('{}'), {})
+        self.assertRaises(json_parser.ParseError, json_parser.json_parse, '')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '[]')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, 'A string')
-        self.assertRaises(json_parser.ParseError, json_parser.json_parse, '')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{"name": "Test Property Set 1", "properties": [{"name": "Width", "type":')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{ asdvhbawlrga }')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{ "name" : nope }')

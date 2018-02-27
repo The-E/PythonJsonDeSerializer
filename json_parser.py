@@ -126,8 +126,6 @@ def _parse_object(json_iterator : peekable) -> dict:
     if next_char != _object_start:
         raise ParseError('Unexpected character while trying to parse object: "' + next_char + '"')
 
-    tokens = {}
-
     # Skip over whitespace
     _whitespace_skip(json_iterator)
 
@@ -135,6 +133,8 @@ def _parse_object(json_iterator : peekable) -> dict:
 
     if next_char == _object_end:
         return {}
+
+    tokens = {}
 
     while True:
         # At the object level, a valid element follows the form "<element name AS string> : <value>"
