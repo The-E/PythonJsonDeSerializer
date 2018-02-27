@@ -22,13 +22,13 @@
     <Compile Include="BackendTask.py" />
     <Compile Include="example_input.py" />
     <Compile Include="example_output.py" />
-    <Compile Include="json_parse.py">
+    <Compile Include="json_parser.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="json_deserialize.py">
+    <Compile Include="property_set_deserializer.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="json_serialize.py" />
+    <Compile Include="json_serializer.py" />
     <Compile Include="test_BackendTask.py" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 from BackendTask import *
-from json_parse import json_parse
+from json_parser import json_parse
 
 def property_set_deserialize(json) -> PropertySet:
     parsed_object = json_parse(json)

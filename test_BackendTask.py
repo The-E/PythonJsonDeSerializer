@@ -1,9 +1,10 @@
 import unittest
+import json_parser
+import json_serializer
+import property_set_deserializer
 
 from BackendTask import PropertySet
 from BackendTask import Property
-from json_serialize import json_serialize
-from json_deserialize import *
 from example_input import *
 
 class Test_test_BackendTask(unittest.TestCase):
@@ -33,11 +34,11 @@ class Test_test_BackendTask(unittest.TestCase):
         property_set.properties.append(Property('FireResistance', 'Class 4'))
         property_set.properties.append(Property('WindLoadRating', 'Class 3'))
 
-        json = json_serialize(property_set)
+        json = json_serializer.json_serialize(property_set)
         self.assertEquals(json, '{"name": "Test Property Set 1", "properties": [{"name": "Width", "type": "Property", "value": 100}, {"name": "Height", "type": "Property", "value": 100}, {"name": "ThermalTransmittance", "type": "Property", "value": 0.9}, {"name": "FireResistance", "type": "Property", "value": "Class 4"}, {"name": "WindLoadRating", "type": "Property", "value": "Class 3"}], "type": "PropertySet"}')
         
     def test_propertyset_deserialize(self):
-        property_set = property_set_deserialize(example_input[0])
+        property_set = property_set_deserializer.property_set_deserialize(example_input[0])
         self.assertIsInstance(property_set, PropertySet)
         self.assertEqual(property_set.name, 'A Property Set 1')
         self.assertEqual(property_set.type, 'PropertySet')
@@ -58,11 +59,11 @@ class Test_test_BackendTask(unittest.TestCase):
         self.assertEqual(property_set.properties[4].name,  'WindLoadRating')
         self.assertEqual(property_set.properties[4].value, 'Class 3')
         
-        self.assertRaisesRegex(ParseError, 'Property ThermalTransmittance is invalid: No type string found', property_set_deserialize, example_input[1])
-        self.assertRaisesRegex(ParseError, 'Property WindLoadRating is invalid: No value found', property_set_deserialize, example_input[2])
-        self.assertRaisesRegex(ParseError, 'Property is invalid: No name string found', property_set_deserialize, example_input[3])
-        self.assertRaisesRegex(ParseError, 'Property FireResistance is invalid: Type string is Properti, should be "Property"', property_set_deserialize, example_input[4])
-        self.assertRaisesRegex(ParseError, 'PropertySet A Property Set 6 is invalid: Type string is: PropertiSet, should be "PropertySet"', property_set_deserialize, example_input[5])
+        self.assertRaisesRegex(property_set_deserializer.ParseError, 'Property ThermalTransmittance is invalid: No type string found', property_set_deserializer.property_set_deserialize, example_input[1])
+        self.assertRaisesRegex(property_set_deserializer.ParseError, 'Property WindLoadRating is invalid: No value found', property_set_deserializer.property_set_deserialize, example_input[2])
+        self.assertRaisesRegex(property_set_deserializer.ParseError, 'Property is invalid: No name string found', property_set_deserializer.property_set_deserialize, example_input[3])
+        self.assertRaisesRegex(property_set_deserializer.ParseError, 'Property FireResistance is invalid: Type string is Properti, should be "Property"', property_set_deserializer.property_set_deserialize, example_input[4])
+        self.assertRaisesRegex(property_set_deserializer.ParseError, 'PropertySet A Property Set 6 is invalid: Type string is: PropertiSet, should be "PropertySet"', property_set_deserializer.property_set_deserialize, example_input[5])
 
     def test_serialization_loop(self):
         property_set = PropertySet('Test Property Set 1')
@@ -72,8 +73,8 @@ class Test_test_BackendTask(unittest.TestCase):
         property_set.properties.append(Property('FireResistance', 'Class 4'))
         property_set.properties.append(Property('WindLoadRating', 'Class 3'))
 
-        json = json_serialize(property_set)
-        property_set_copy = property_set_deserialize(json)
+        json = json_serializer.json_serialize(property_set)
+        property_set_copy = property_set_deserializer.property_set_deserialize(json)
 
         self.assertIsInstance(property_set_copy, PropertySet)
         self.assertEqual(property_set.name, property_set_copy.name)
@@ -94,6 +95,15 @@ class Test_test_BackendTask(unittest.TestCase):
         self.assertEqual(property_set.properties[3].value, property_set_copy.properties[3].value)
         self.assertEqual(property_set.properties[4].name,  property_set_copy.properties[4].name) 
         self.assertEqual(property_set.properties[4].value, property_set_copy.properties[4].value)
+
+    def test_json(self):
+        self.assertEqual(json_parser.json_parse('{}'), {})
+        self.assertRaises(json_parser.ParseError, json_parser.json_parse, '[]')
+        self.assertRaises(json_parser.ParseError, json_parser.json_parse, 'A string')
+        self.assertRaises(json_parser.ParseError, json_parser.json_parse, '')
+        self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{"name": "Test Property Set 1", "properties": [{"name": "Width", "type":')
+        self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{ asdvhbawlrga }')
+        self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{ "name" : nope }')
 
 if __name__ == '__main__':
     unittest.main()

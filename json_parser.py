@@ -131,8 +131,15 @@ def _parse_object(json_iterator : peekable) -> dict:
     # Skip over whitespace
     _whitespace_skip(json_iterator)
 
+    next_char = json_iterator.peek()
+
+    if next_char == _object_end:
+        return {}
+
     while True:
         # At the object level, a valid element follows the form "<element name AS string> : <value>"
+        if json_iterator.peek() not in (_string_delimiter, _token_separator):
+            raise ParseError('Unexpected character: "' + next_char + '"')
         element_name = _parse_string(json_iterator)
         element_value = None
         
@@ -178,10 +185,11 @@ def _parse_object(json_iterator : peekable) -> dict:
 # Check if the number of opening and closing elements for objects and arrays match up
 # returns true if they do, if they don't, the returned list of strings will indicate which test(s) failed
 def _syntax_check(json : str) -> (bool, list):
+    check_content = json != ''
     check_objects = json.count(_object_start) - json.count(_object_end) == 0
     check_arrays = json.count(_array_start) - json.count(_array_end) == 0
 
-    if check_objects and check_arrays:
+    if check_objects and check_arrays and check_content:
         return (True, [])
     else:
         fails = []
@@ -189,6 +197,8 @@ def _syntax_check(json : str) -> (bool, list):
             fails.append('objects')
         if not check_arrays:
             fails.append('arrays')
+        if not check_content:
+            fails.append('empty string')
         return (False, fails)
 
 # Given a json string, return a representation of that string as a dict 
