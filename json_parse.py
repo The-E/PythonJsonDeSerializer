@@ -22,8 +22,6 @@ _null_start = 'n'
 _token_separator = ','
 _pair_separator = ':'
 
-_tokens = {}
-
 def _whitespace_skip(json_iterator : peekable):
     next_char = json_iterator.peek()
     while json_iterator.peek() in string.whitespace:
