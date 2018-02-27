@@ -1,7 +1,7 @@
 import io
 
 # Helper functions
-def is_builtin_class_instance(obj):
+def _is_builtin_class_instance(obj):
     return obj.__class__.__module__ == 'builtins'
 
 # Marks the last element of a collection 
@@ -17,12 +17,12 @@ def islast(o):
             yield (True, e)
             break
 
-def collection_serialize(obj):
+def _collection_serialize(obj):
     result = io.StringIO()
 
     result.write('[')
     for (last, value) in islast(obj):
-        if is_builtin_class_instance(value):
+        if _is_builtin_class_instance(value):
             if isinstance(value, str):
                 result.write('\"' + value + '\"')
             else:
@@ -38,11 +38,46 @@ def collection_serialize(obj):
 
     return result.getvalue()
 
+def _dict_serialize(obj : dict):
+    if len(obj.keys()) == 0:
+        return '{}'
+    
+    result = io.StringIO()
+
+    result.write('{')
+
+    for key in obj:
+        result.write('"' + key + '" : ' )
+        value = obj[key]
+        if isinstance(value, (list, tuple)):
+            result.write(_collection_serialize(value))
+        elif isinstance(value, dict):
+            result.write(_dict_serialize(value))
+        else:
+            if (_is_builtin_class_instance(value)):
+                if isinstance(value, str):
+                    result.write('\"' + value + '\"')
+                else:
+                    if value == None:
+                        result.write('null')
+                    else:
+                        result.write(repr(value).lower())
+            else:
+                result.write(json_serialize(value))
+        result.write(',')
+
+    output = result.getvalue()[:-1]
+    output += '}'
+
+    return output
+
 def json_serialize(obj):
     result = io.StringIO()
 
     if isinstance(obj, (list, tuple)):
-        return collection_serialize(obj)
+        return _collection_serialize(obj)
+    if isinstance(obj, dict):
+        return _dict_serialize(obj)
 
     result.write('{')
 
@@ -52,9 +87,11 @@ def json_serialize(obj):
         result.write('\"' + property + '\": ')
         value = getattr(obj, property)
         if isinstance(value, (list, tuple)):
-            result.write(collection_serialize(value))
+            result.write(_collection_serialize(value))
+        elif isinstance(value, dict):
+            result.write(_dict_serialize)
         else:
-            if (is_builtin_class_instance(value)):
+            if (_is_builtin_class_instance(value)):
                 if isinstance(value, str):
                     result.write('\"' + value + '\"')
                 else:

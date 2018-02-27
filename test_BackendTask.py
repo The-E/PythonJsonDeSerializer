@@ -96,7 +96,7 @@ class Test_test_BackendTask(unittest.TestCase):
         self.assertEqual(property_set.properties[4].value, property_set_copy.properties[4].value)
         self.assertEqual(property_set.properties[4].type,  property_set_copy.properties[4].type) 
 
-    def test_json(self):
+    def test_json_parse(self):
         self.assertEqual(json_parser.json_parse('{}'), {})
         self.assertEqual(json_parser.json_parse('{ "value" : "a string" }'), { 'value' : 'a string' } )
         self.assertEqual(json_parser.json_parse('{ "value" : ["an", "array"] }'), { 'value' : ['an', 'array'] } )
@@ -113,6 +113,15 @@ class Test_test_BackendTask(unittest.TestCase):
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{"name": "Test Property Set 1", "properties": [{"name": "Width", "type":')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{ asdvhbawlrga }')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '{ "name" : nope }')
+
+    def test_json_serialize(self):
+        self.assertEqual(json_serializer.json_serialize( {} ), '{}')
+        self.assertEqual(json_serializer.json_serialize( { 'value' : 'a string' } ), '{"value" : "a string"}' )
+        self.assertEqual(json_serializer.json_serialize( { 'value' : True } ), '{"value" : true}' )
+        self.assertEqual(json_serializer.json_serialize( { 'value' : None } ), '{"value" : null}' )
+        self.assertEqual(json_serializer.json_serialize( { 'value' : [0, 1, 2, 3.14] } ), '{"value" : [0, 1, 2, 3.14]}' )
+        self.assertEqual(json_serializer.json_serialize( { 'value' : 'a string', 'and' : 'another string' } ), '{"value" : "a string","and" : "another string"}' )
+        self.assertEqual(json_serializer.json_serialize( { 'value' : { 'a' : 'nested' , 'value' : 10 } } ), '{"value" : {"a" : "nested","value" : 10}}' )
 
 if __name__ == '__main__':
     unittest.main()
