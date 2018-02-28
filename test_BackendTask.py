@@ -100,13 +100,14 @@ class Test_test_BackendTask(unittest.TestCase):
         self.assertEqual(json_parser.json_parse('{}'), {})
         self.assertEqual(json_parser.json_parse('{ "value" : "a string" }'), { 'value' : 'a string' } )
         self.assertEqual(json_parser.json_parse('{ "value" : ["an", "array"] }'), { 'value' : ['an', 'array'] } )
-        self.assertEqual(json_parser.json_parse('{ "value" : null }'), { 'value' : None } )
-        self.assertEqual(json_parser.json_parse('{ "value" : false }'), { 'value' : False } )
+        self.assertEqual(json_parser.json_parse('{ "value" : null}'), { 'value' : None } )
+        self.assertEqual(json_parser.json_parse('{ "value" : false}'), { 'value' : False } )
         self.assertEqual(json_parser.json_parse('{ "value" : 0 }'), { 'value' : 0 } )
         self.assertEqual(json_parser.json_parse('{ "value" : 3.14 }'), { 'value' : 3.14 } )
         self.assertEqual(json_parser.json_parse('{ "value" : -10 }'), { 'value' : -10 } )
         self.assertEqual(json_parser.json_parse('{ "value" : 2.1e10 }'), { 'value' : 21000000000 } )
         self.assertEqual(json_parser.json_parse('{ "value" : { "nested" : true } }'), { 'value' : { 'nested' : True} } )
+        self.assertEqual(json_parser.json_parse('{ "value" : [{}, {"a" : "value"}]}'), {'value' : [{}, {'a' : 'value'}] } )
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, '[]')
         self.assertRaises(json_parser.ParseError, json_parser.json_parse, 'A string')
@@ -122,6 +123,7 @@ class Test_test_BackendTask(unittest.TestCase):
         self.assertEqual(json_serializer.json_serialize( { 'value' : [0, 1, 2, 3.14] } ), '{"value" : [0, 1, 2, 3.14]}' )
         self.assertEqual(json_serializer.json_serialize( { 'value' : 'a string', 'and' : 'another string' } ), '{"value" : "a string","and" : "another string"}' )
         self.assertEqual(json_serializer.json_serialize( { 'value' : { 'a' : 'nested' , 'value' : 10 } } ), '{"value" : {"a" : "nested","value" : 10}}' )
+        
 
 if __name__ == '__main__':
     unittest.main()

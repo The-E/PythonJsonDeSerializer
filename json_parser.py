@@ -58,11 +58,8 @@ def _parse_numeric(json_iterator : peekable) -> numbers.Number:
 def _parse_boolean(json_iterator : peekable) -> bool:
     value = ''
     
-    next_char = json_iterator.next()
-    
-    while next_char not in string.whitespace and next_char not in (_token_separator, _object_end, _array_end):
-        value += next_char
-        next_char = json_iterator.next()
+    while json_iterator.peek() not in string.whitespace and json_iterator.peek() not in (_token_separator, _object_end, _array_end):
+        value += json_iterator.next()
 
     if value == 'true':
         return True
@@ -74,10 +71,8 @@ def _parse_boolean(json_iterator : peekable) -> bool:
 def _parse_null(json_iterator : peekable):
     value = ''
         
-    next_char = json_iterator.next()
-    while next_char not in string.whitespace and next_char not in (_token_separator, _object_end, _array_end):
-        value += next_char
-        next_char = json_iterator.next()
+    while json_iterator.peek() not in string.whitespace and json_iterator.peek() not in (_token_separator, _object_end, _array_end):
+        value += json_iterator.next()
 
     if value == 'null':
         return None
@@ -133,6 +128,7 @@ def _parse_object(json_iterator : peekable) -> dict:
     next_char = json_iterator.peek()
 
     if next_char == _object_end:
+        json_iterator.next()
         return {}
 
     tokens = {}
