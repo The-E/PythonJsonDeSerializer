@@ -53,7 +53,10 @@ def _parse_numeric(json_iterator : peekable) -> numbers.Number:
     try:
         return int(value)
     except ValueError:
-        return float(value)
+        try:
+            return float(value)
+        except ValueError:
+            raise ParseError('String ' + value + ' could not be parsed as a number')
 
 def _parse_boolean(json_iterator : peekable) -> bool:
     value = ''
@@ -86,6 +89,7 @@ def _parse_array(json_iterator : peekable) -> list:
     next_char = json_iterator.peek()
     
     if next_char == _array_end:
+        json_iterator.next()
         return [] # Empty Array
 
     while True:
@@ -178,30 +182,10 @@ def _parse_object(json_iterator : peekable) -> dict:
         _whitespace_skip(json_iterator)
 
     return tokens
-    
-# Check if the number of opening and closing elements for objects and arrays match up
-# returns true if they do, if they don't, the returned list of strings will indicate which test(s) failed
-def _syntax_check(json : str) -> (bool, list):
-    check_content = json != ''
-    check_objects = json.count(_object_start) - json.count(_object_end) == 0
-    check_arrays = json.count(_array_start) - json.count(_array_end) == 0
-
-    if check_objects and check_arrays and check_content:
-        return (True, [])
-    else:
-        fails = []
-        if not check_objects:
-            fails.append('objects')
-        if not check_arrays:
-            fails.append('arrays')
-        if not check_content:
-            fails.append('empty string')
-        return (False, fails)
 
 # Given a json string, return a representation of that string as a dict 
 def json_parse(json : str) -> dict:
-    (success, failures) = _syntax_check(json)
-    if not success:
-        raise ParseError('Passed string is not valid json. Could not validate the following elements: ' + repr(failures))
+    if json == '':
+        raise ParseError('Cannot parse an empty string')
 
     return _parse_object(peekable(json))
